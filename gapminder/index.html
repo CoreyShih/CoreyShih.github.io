@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>World Population Analysis</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Population</a></li>
+            <li><a href="growth.html">Population Growth</a></li>
+            <li><a href="density.html">Population Density</a></li>
+        </ul>
+    </nav>
+    <h1>World Population Analysis</h1>
+    <select id="selectButton"></select>
+    <div id="my_dataviz"></div>
+    <footer>
+        <ul>
+            <li>Data courtesy of <a href="https://www.gapminder.org/">Gapminder</a></li>
+            <li>Site created by Corey Shih</li>
+        </ul>
+    </footer>
+    <script>
+        var margin = {top: 50, right: 50, bottom: 50, left: 50},
+            width = 1200 - margin.left - margin.right,
+            height = 900 - margin.top - margin.bottom;
+        
+        var svg = d3.select("#my_dataviz")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        d3.csv("data/population_total_T.csv", function(data) {
+
+            var allGroup = data.columns.shift();
+
+          d3.select("#selectButton")
+             .selectAll('myOptions')
+               	.data(allGroup)
+            .enter()
+    	       .append('option')
+             .text(function (d) { return d; })
+            .attr("value", function (d) { return d; })
+
+         var myColor = d3.scaleOrdinal()
+             .domain(allGroup)
+             .range(d3.schemeSet2);
+
+         var x = d3.scaleLinear()
+             .domain([1800,2019])
+             .range([ 0, width ]);
+         svg.append("g")
+             .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+         var y = d3.scaleLinear()
+            .range([ height, 0 ]);
+         svg.append("g")
+             .call(d3.axisLeft(y));
+
+         var line = svg
+              .append('g')
+             .append("path")
+              .datum(data)
+              .attr("d", d3.line()
+               .x(function(d) { return x(+d.Year) })
+               .y(function(d) { return y(+d.World) })
+              )
+              .attr("stroke", function(d){ return myColor("World") })
+             .style("stroke-width", 4)
+                .style("fill", "none")
+
+            function update(selectedGroup) {
+
+             var dataFilter = data.map(function(d){return {Year: d.Year, value:d[selectedGroup]} })
+
+             y.domain([0, d3.max(dataFilter, function(d) { return d.value }) ]);
+             yAxis.transition().duration(1000).call(d3.axisLeft(y));
+             
+             line
+                 .datum(dataFilter)
+                .transition()
+                 .duration(1000)
+                 .attr("d", d3.line()
+                    .x(function(d) { return x(+d.Year) })
+                 .y(function(d) { return y(+d.value) })
+                )
+                .attr("stroke", function(d){ return myColor(selectedGroup) })
+            }
+
+         d3.select("#selectButton").on("change", function(d) {
+                var selectedOption = d3.select(this).property("value")
+                update(selectedOption)
+            })
+
+        })
+    </script>
+</body>
+</html>
