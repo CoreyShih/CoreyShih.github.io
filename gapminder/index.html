@@ -9,9 +9,9 @@
 <body>
     <nav>
         <ul>
-            <li><a href="index.html">Population</a></li>
+            <li><a href="index.html">Home</a></li>
             <li><a href="growth.html">Population Growth</a></li>
-            <li><a href="density.html">Population Density</a></li>
+            <li><a href="dist.html">Population Distribution</a></li>
         </ul>
     </nav>
     <h1>World Population Analysis</h1>
@@ -24,9 +24,9 @@
         </ul>
     </footer>
     <script>
-        var margin = {top: 50, right: 50, bottom: 50, left: 100},
-            width = 1200 - margin.left - margin.right,
-            height = 900 - margin.top - margin.bottom;
+        var margin = {top: 50, right: 50, bottom: 100, left: 100},
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
         
         var svg = d3.select("#my_dataviz")
             .append("svg")
@@ -54,15 +54,30 @@
          var x = d3.scaleLinear()
              .domain([1800,2019])
              .range([ 0, width ]);
-         svg.append("g")
+         var xAxis = svg.append("g")
              .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
+             .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+         svg.append("text")
+            .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
+            .style("text-anchor", "middle")
+            .style("font-family", "arial")
+            .style("font-weight", "bold")
+            .text("Year");
 
          var y = d3.scaleLinear()
             .domain([0,8000000000])
             .range([ height, 0 ]);
          var yAxis = svg.append("g")
              .call(d3.axisLeft(y));
+         svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x",0 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-family", "arial")
+            .style("font-weight", "bold")
+            .text("Population");
 
          var line = svg
               .append('g')
@@ -76,13 +91,31 @@
              .style("stroke-width", 4)
                 .style("fill", "none")
 
+         svg.append("line")
+            .attr("x1", x(1990))
+            .attr("x2", x(1990))
+            .attr("y1", y(2000000000))
+            .attr("y2", y(5297255282))
+            .attr("stroke", "grey")
+            .attr("stroke-dasharray", "4")
+            .attr("id", "annotation-line")
+         svg.append("text")
+            .attr("x", x(1966))
+            .attr("y", y(1700000000))
+            .attr("id", "annotation-text")
+            .text("World population increasing steadily")
+            .style("font-family", "arial")
+            .style("font-size", "12px")
+
             function update(selectedGroup) {
 
              var dataFilter = data.map(function(d){return {Year: d.Year, value:d[selectedGroup]} })
-             console.log(d3.max(dataFilter, function(d) { return +d.value }));
 
              y.domain([0, d3.max(dataFilter, function(d) { return +d.value }) ]);
              yAxis.transition().duration(1000).call(d3.axisLeft(y));
+             
+             d3.select("#annotation-line").remove()
+             d3.select("#annotation-text").remove()
 
              line
                  .datum(dataFilter)
