@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>World Population Analysis</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="growth.html">Population Growth</a></li>
+            <li><a href="dist.html">Population Distribution</a></li>
+        </ul>
+    </nav>
+    <h1>World Population Analysis</h1>
+    <div id="my_dataviz"></div>
+    <footer>
+        <ul>
+            <li>Data courtesy of <a href="https://www.gapminder.org/">Gapminder</a></li>
+            <li>Site created by Corey Shih</li>
+        </ul>
+    </footer>
+    <script>
+        var margin = {top: 50, right: 50, bottom: 100, left: 100},
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+        var svg = d3.select("#my_dataviz")
+            .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.csv("https://raw.githubusercontent.com/CoreyShih/CoreyShih.github.io/master/gapminder/data/2019_population.csv", function(data) {
+            
+            var x = d3.scaleLog()
+                .domain([1, d3.max(data, function(d) { return +d['2019 population'] })])
+                .range([0, width]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            var histogram = d3.histogram()
+                .value(function(d) { return d['2019 population']; })
+                .domain(x.domain())
+                .thresholds(x.ticks(20));
+
+            var bins = histogram(data);
+
+            var y = d3.scaleLinear()
+                .domain([0, d3.max(bins, function (d) { return d.length; })])
+                .range([height, 0]);
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+            svg.selectAll("rect")
+                .data(bins)
+                .enter()
+                .append("rect")
+                    .attr("x", 1)
+                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                    .attr("width", function(d) { return x(d.x1) - x(d.x0) - 1; })
+                    .attr("height", function(d) { return height - y(d.length); })
+                    .style("fill", "green");
+
+        })
+    </script>
+</body>
+</html>
