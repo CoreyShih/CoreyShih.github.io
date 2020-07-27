@@ -13,8 +13,12 @@
             <li><a href="dist.html">Population Distribution</a></li>
         </ul>
     </nav>
-    <h1>World Population Analysis</h1>
+    <h1>Country Population Distribution 2019</h1>
     <div id="my_dataviz"></div>
+    <p>
+        <label>bins:</label>
+        <input type="number" min="1" max="100" step="20" value="20" id="nBin">
+    </p>
     <footer>
         <ul>
             <li>Data courtesy of <a href="https://www.gapminder.org/">Gapminder</a></li>
@@ -36,37 +40,96 @@
         d3.csv("https://raw.githubusercontent.com/CoreyShih/CoreyShih.github.io/master/gapminder/data/2019_log_population.csv", function(data) {
             
             var x = d3.scaleLinear()
-                .domain([d3.min(data, function(d) { return +d['2019 population'] }), d3.max(data, function(d) { return +d['2019 population'] })])
+                .domain([0,24])
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x));
-
-            var histogram = d3.histogram()
-                .value(function(d) { return d['2019 population']; })
-                .domain(x.domain())
-                .thresholds(x.ticks(20));
-
-            var bins = histogram(data);
-            console.log(bins);
+            svg.append("text")
+                .attr("transform", "translate(" + (width/2) + " ," + (height + margin.top + 20) + ")")
+                .style("text-anchor", "middle")
+                .style("font-family", "arial")
+                .style("font-weight", "bold")
+                .text("log(Population)");
 
             var y = d3.scaleLinear()
-                .domain([0, d3.max(bins, function (d) { return d.length; })])
                 .range([height, 0]);
-            svg.append("g")
-                .call(d3.axisLeft(y));
+            var yAxis = svg.append("g");
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x",0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .style("font-family", "arial")
+                .style("font-weight", "bold")
+                .text("Count");
 
-            svg.selectAll("rect")
-                .data(bins)
-                .enter()
-                .append("rect")
-                    .attr("x", 1)
-                    .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
-                    .attr("width", function(d) { return x(d.x1) - x(d.x0) - 1; })
-                    .attr("height", function(d) { return height - y(d.length); })
-                    .style("fill", "green");
 
-        })
+            function update(nBin) {
+
+                var histogram = d3.histogram()
+                    .value(function(d) { return d["2019 population"]; })
+                    .domain(x.domain())
+                    .thresholds(x.ticks(nBin));
+
+                var bins = histogram(data);
+
+                y.domain([0, d3.max(bins, function(d) { return d.length; })]);
+                yAxis
+                    .transition()
+                    .duration(1000)
+                    .call(d3.axisLeft(y));
+
+                var u = svg.selectAll("rect")
+                    .data(bins)
+
+                u
+                    .enter()
+                    .append("rect")
+                    .merge(u)
+                    .transition()
+                    .duration(1000)
+                        .attr("x", 1)
+                        .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+                        .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+                        .attr("height", function(d) { return height - y(d.length); })
+                        .style("fill", "SeaGreen")
+
+
+                u
+                    .exit()
+                    .remove()
+
+                d3.select("#annotation-line").remove();
+                d3.select("#annotation-text").remove();
+
+                svg.append("line")
+                    .attr("id", "annotation-line")
+                    .attr("x1", x(15.576))
+                    .attr("x2", x(15.576))
+                    .attr("y1", y(0))
+                    .attr("y2", y(d3.max(bins, function(d) { return d.length; })))
+                    .attr("stroke", "grey")
+                    .attr("stroke-dasharray", "4");
+                svg.append("text")
+                    .attr("id", "annotation-text")
+                    .attr("x", x(13.3))
+                    .attr("y", 10)
+                    .text("mean: 15.58")
+                    .style("font-family", "arial")
+                    .style("font-weight", "bold")
+                    .style("font-size", "12px");
+
+            }
+
+            update(20);
+
+            d3.select("#nBin").on("input", function() {
+                update(+this.value);
+            });
+
+        });
     </script>
 </body>
 </html>
