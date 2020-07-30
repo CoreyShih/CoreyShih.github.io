@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>World Population Analysis</title>
+    <title>Global Population Growth Analysis</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://d3js.org/d3.v4.js"></script>
 </head>
@@ -9,16 +9,20 @@
     <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="growth.html">Population Growth</a></li>
-            <li><a href="dist.html">Population Distribution</a></li>
+            <li><a href="growth.html">Population Growth by Country</a></li>
+            <li><a href="dist.html">Population Growth Distribution</a></li>
         </ul>
     </nav>
-    <h1>Population Distribution</h1>
-    <div id="my_dataviz"></div>
+    <h1>Population Growth Distribution</h1>
+    <p>The histogram below shows the number of countries with their annual percentage population growth in 2018 within a certain range. The
+       average percentage population growth for a country in 2018 was 1.3%. The majority of countries experienced growth between 0% and 2%.
+       The outliers on the low and high ends of the spectrum are Venezuela and Bahrain, respectively.</p>
+    <p>Use the field below to change the number of bins of the histogram. Values in the range of 1 to 100 are acceptable.</p>
     <p>
         <label>bins:</label>
         <input type="number" min="1" max="100" step="20" value="20" id="nBin">
     </p>
+    <div id="my_dataviz"></div>
     <footer>
         <ul>
             <li>Data courtesy of <a href="https://www.gapminder.org/">Gapminder</a></li>
@@ -37,10 +41,10 @@
             .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        d3.csv("https://raw.githubusercontent.com/CoreyShih/CoreyShih.github.io/master/gapminder/data/2019_log_population.csv", function(data) {
+        d3.csv("https://raw.githubusercontent.com/CoreyShih/CoreyShih.github.io/master/gapminder/data/2018_population_growth.csv", function(data) {
             
             var x = d3.scaleLinear()
-                .domain([0,24])
+                .domain([-0.02, 0.052])
                 .range([0, width]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
@@ -50,7 +54,7 @@
                 .style("text-anchor", "middle")
                 .style("font-family", "arial")
                 .style("font-weight", "bold")
-                .text("log(Population)");
+                .text("% Population Growth");
 
             var y = d3.scaleLinear()
                 .range([height, 0]);
@@ -65,11 +69,10 @@
                 .style("font-weight", "bold")
                 .text("Count");
 
-
             function update(nBin) {
 
                 var histogram = d3.histogram()
-                    .value(function(d) { return d["2019 population"]; })
+                    .value(function(d) { return d["2018"]; })
                     .domain(x.domain())
                     .thresholds(x.ticks(nBin));
 
@@ -96,27 +99,26 @@
                         .attr("height", function(d) { return height - y(d.length); })
                         .style("fill", "SeaGreen")
 
-
                 u
                     .exit()
                     .remove()
-
+                
                 d3.select("#annotation-line").remove();
                 d3.select("#annotation-text").remove();
 
                 svg.append("line")
                     .attr("id", "annotation-line")
-                    .attr("x1", x(15.576))
-                    .attr("x2", x(15.576))
-                    .attr("y1", y(0))
-                    .attr("y2", y(d3.max(bins, function(d) { return d.length; })))
-                    .attr("stroke", "grey")
+                    .attr("x1", x(0.013))
+                    .attr("x2", x(0.013))
+                    .attr("y1", height)
+                    .attr("y2", 0)
+                    .attr("stroke", "black")
                     .attr("stroke-dasharray", "4");
                 svg.append("text")
                     .attr("id", "annotation-text")
-                    .attr("x", x(13.3))
-                    .attr("y", 10)
-                    .text("mean: 15.58")
+                    .attr("x", x(0.014))
+                    .attr("y", 15)
+                    .text("mean: 0.0130")
                     .style("font-family", "arial")
                     .style("font-weight", "bold")
                     .style("font-size", "12px");

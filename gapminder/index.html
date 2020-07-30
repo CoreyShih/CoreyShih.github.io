@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>World Population Analysis</title>
+    <title>Global Population Growth Analysis</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body>
     <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="growth.html">Population Growth</a></li>
-            <li><a href="dist.html">Population Distribution</a></li>
+            <li><a href="growth.html">Population Growth by Country</a></li>
+            <li><a href="dist.html">Population Growth Distribution</a></li>
         </ul>
     </nav>
-    <h1>World Population Analysis</h1>
+    <h1>Global Population Growth Analysis</h1>
+    <p>As the global population continues to increase, there are mounting concerns about the impact of human overpopulation on the 
+       environment, as well as concerns about increased demand for natural resources. In this narrative visualization, we examine the 
+       population dynamics of the world by individual countries.</p>
+    <p>In the graph below, we can see that the world population has been increasing at a nearly linear rate since approximately 1960.
+       However, the population of individual countries has been changing at a much more varied rate by country. Many developed countries
+       are seeing their population growth begin to stagnate, and in some cases, the population for certain countries has even been declining
+       for a number of years. Conversely, population growth in many underdeveloped countries shows no signs of slowing down.</p>
+    <p>Use the drop-down menu below to select a country to see how its population has changed over time. Use the links at the top of the page to
+       view additional charts and analyses.</p>
     <select id="selectButton"></select>
     <div id="my_dataviz"></div>
     <footer>
@@ -45,11 +53,7 @@
             .enter()
     	       .append('option')
              .text(function (d) { return d; })
-            .attr("value", function (d) { return d; })
-
-         var myColor = d3.scaleOrdinal()
-             .domain(allGroup)
-             .range(d3.schemeSet2);
+            .attr("value", function (d) { return d; });
 
          var x = d3.scaleLinear()
              .domain([1800,2019])
@@ -87,7 +91,7 @@
                .x(function(d) { return x(+d.Year) })
                .y(function(d) { return y(+d.World) })
               )
-              .attr("stroke", function(d){ return myColor("World") })
+              .attr("stroke", "SeaGreen")
              .style("stroke-width", 4)
                 .style("fill", "none")
 
@@ -96,7 +100,7 @@
             .attr("x2", x(1990))
             .attr("y1", y(2000000000))
             .attr("y2", y(5297255282))
-            .attr("stroke", "grey")
+            .attr("stroke", "black")
             .attr("stroke-dasharray", "4")
             .attr("id", "annotation-line")
          svg.append("text")
@@ -126,7 +130,7 @@
                     .x(function(d) { return x(+d.Year) })
                  .y(function(d) { return y(+d.value) })
                 )
-                .attr("stroke", function(d){ return myColor(selectedGroup) })
+                .attr("stroke", "SeaGreen")
             }
 
          d3.select("#selectButton").on("change", function(d) {

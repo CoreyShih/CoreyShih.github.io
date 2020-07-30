@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>World Population Analysis</title>
+    <title>Global Population Growth Analysis</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://d3js.org/d3.v4.js"></script>
 </head>
@@ -9,11 +9,15 @@
     <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="growth.html">Population Growth</a></li>
-            <li><a href="dist.html">Population Distribution</a></li>
+            <li><a href="growth.html">Population Growth by Country</a></li>
+            <li><a href="dist.html">Population Growth Distribution</a></li>
         </ul>
     </nav>
-    <h1>Population Growth</h1>
+    <h1>Population Growth by Country</h1>
+    <p>The bar chart below shows the annual percentage population growth for each country in 2018. There are 22 countries that experienced a decline
+       in population in 2018, marked in red. The vast majority of countries, however, are still experiencing positive population growth. Interestingly,
+       many of the countries with declining populations seem to be situated in Europe.</p>
+    <p>Hover over any bar in the chart below for specific information about that country.</p>
     <div id="my_dataviz"></div>
     <footer>
         <ul>
@@ -91,28 +95,28 @@
                 .attr("x2", x("Ukraine"))
                 .attr("y1", y(0.002))
                 .attr("y2", y(0.01))
-                .attr("stroke", "grey")
+                .attr("stroke", "black")
                 .attr("stroke-dasharray", "4");
             svg.append("line")
                 .attr("x1", x("Cuba"))
                 .attr("x2", x("Venezuela"))
                 .attr("y1", y(0.002))
                 .attr("y2", y(0.002))
-                .attr("stroke", "grey")
+                .attr("stroke", "black")
                 .attr("stroke-dasharray", "4");
             svg.append("line")
                 .attr("x1", x("Venezuela"))
                 .attr("x2", x("Venezuela"))
                 .attr("y1", y(0.002))
                 .attr("y2", y(0.0005))
-                .attr("stroke", "grey")
+                .attr("stroke", "black")
                 .attr("stroke-dasharray", "4");
             svg.append("line")
                 .attr("x1", x("Cuba"))
                 .attr("x2", x("Cuba"))
                 .attr("y1", y(0.002))
                 .attr("y2", y(0.0005))
-                .attr("stroke", "grey")
+                .attr("stroke", "black")
                 .attr("stroke-dasharray", "4");
             svg.append("text")
                 .attr("x", x("Georgia"))
